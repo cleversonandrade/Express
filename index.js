@@ -3,6 +3,7 @@ const app = express()
 const handlebars = require('express-handlebars')
 const bodyParser = require('body-parser')
 const Post = require('./models/Post')
+const { where } = require('sequelize')
 
 // Config
     // Template Engine
@@ -12,9 +13,15 @@ const Post = require('./models/Post')
     app.use(bodyParser.urlencoded({extended: false}))
     app.use(bodyParser.json())
 
-// Rotas
-    app.get('/', function(req,res) {
-        res.render('home')
+//Rotas
+    app.get('/', async (req,res) => {
+        try {
+        const posts = await Post.findAll({order: [['id', 'DESC']]});
+        const plainPosts = posts.map(post => post.toJSON())
+        res.render('home', { posts:plainPosts })
+        } catch (error) {
+        res.status(500).send(error.mensagem)
+        }
     })
 
     app.get('/cad', function(req,res) {
@@ -29,6 +36,15 @@ const Post = require('./models/Post')
             res.redirect('/')
         }).catch(function(erro) {
             res.send('Houve um erro ' + erro)
+        })
+    })
+
+//Rota para deletar
+    app.get('/deletar/:id', function(req,res) {
+        Post.destroy({where: {id: req.params.id} }).then(function(){
+            res.send('Postagem deletada com sucesso!')
+        }).catch(function(erro) {
+            res.send('Esta postagem não existe!')
         })
     })
 

@@ -1,1 +1,8 @@
-<h1>Lista de posts</h1>
+<h1>Lista de Posts: 
+    {{#each posts}}
+        <h2>{{this.titulo}}</h2>
+        <p>{{this.conteudo}}</p>
+        <a href="/deletar/{{this.id}}"><button>Deletar</button></a>
+        <hr>
+    {{/each}}
+</h1>
